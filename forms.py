@@ -43,9 +43,12 @@ class DescriptionForm(FlaskForm):
         render_kw={"placeholder": gettext('Please enter a valid image url.')})
     saturday = StringField(gettext(
         'What does a perfect saturday evening look like for you?'),
-        validators=[InputRequired()])
+        validators=[InputRequired(), ImageURL()],
+        render_kw={"placeholder": gettext('Please enter a valid image url.')})
     place = StringField(gettext('Where would you like to be right now?'),
-                        validators=[InputRequired()])
+                        validators=[InputRequired(), ImageURL()],
+                        render_kw={"placeholder":
+                                   gettext('Please enter a valid image url.')})
     quote = StringField(gettext('What is your favourite quote?'),
                         validators=[InputRequired()])
     theme = StringField(gettext(

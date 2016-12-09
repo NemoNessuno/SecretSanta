@@ -13,11 +13,19 @@
                 <tr>
                     <td>{{_('What does a perfect saturday evening look like
                         for you?') }}</td>
-                    <td>{{_(description.saturday) }}</td>
+                    <td>
+                        <a href="{{ description.saturday }}">
+                            <img src="{{ description.saturday }}"/>
+                        </a>
+                    </td>
                 </tr>
                 <tr>
                     <td>{{_('Where would you like to be right now?') }}</td>
-                    <td>{{_(description.place) }}</td>
+                    <td>
+                        <a href="{{ description.place}}">
+                            <img src="{{ description.place }}"/>
+                        </a>
+                    </td>
                 </tr>
                 <tr>
                     <td>{{_('What is your favourite quote?') }}</td>
