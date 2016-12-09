@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block title %} {{_('Home')}} {% endblock %}
+{% block content %}
+<center>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <p class="lead"></p>
+    <div class="row">
+        <div class="col-md-12"> 
+            <h4>{{_('Your current description.')}}</h4>
+        </div>
+    </div>
+    {% include 'description_form.html' %}
+</center>
+{% endblock %}

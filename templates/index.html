@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block title %} {{_('Home')}} {% endblock %}
+{% block content %}
+<center>
+    <p class="lead"></p>
+    {% if not description %}
+    <div class="row">
+        <div class="bs-callout bs-callout-info col-md-12"> 
+            <h4>{{_('Drawing has not happened, yet. You can still update your
+                description.')}}</h4>
+        </div>
+    </div>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <div class="row">
+        <div class="col-md-12">
+            <form action="{{ url_for('index') }}" method="post">
+                {{ form.csrf_token }}
+                {% for field in form if field.widget.input_type
+                != 'hidden' %}
+                <div class="form-group">
+                    {{ field.label }} 
+                    {{ field(class_="form-control") }}
+                </div>
+                {% endfor %}
+                <div
+                     class="form-group">
+                    <input type='submit' value="{{_('Submit')}}" class='btn
+                    btn-primary btn-lg'/>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-md-12">
+            <h4>
+                {{_('Your beneficary has been drawn. Please have a look at the
+                following hints.')}}
+            </h4>
+        </div>
+    </div>
+    {% include 'description_form.html' %}
+    {% endif %}
+</center>
+{% endblock %}
