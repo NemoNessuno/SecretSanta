@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block title %} {{_('Home')}} {% endblock %}
+{% block title %} {{_('Description')}} {% endblock %}
 {% block content %}
 <center>
     {% with messages = get_flashed_messages() %}
@@ -11,12 +11,6 @@
     </div>
     {% endif %}
     {% endwith %}
-    <p class="lead"></p>
-    <div class="row">
-        <div class="col-md-12"> 
-            <h4>{{_('Your current description.')}}</h4>
-        </div>
-    </div>
-    {% include 'description_form.html' %}
+        {% include 'description_form.html' %}
 </center>
 {% endblock %}

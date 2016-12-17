@@ -5,6 +5,7 @@ from models import User, Description
 from db_handler import db_session
 from flask_babel import Babel, gettext
 from forms import LoginForm, SignUpForm, DescriptionForm
+from random import shuffle
 
 # Initialize the base app and load the config
 app = Flask(__name__)
@@ -75,7 +76,6 @@ def index():
     elif len(form.errors) > 0:
             print_errors(form)
 
-    print current_user.other_description
     return render_template('index.html', active=0, form=form,
                            description=current_user.other_description)
 
@@ -85,6 +85,16 @@ def index():
 def description():
     return render_template('description.html', active=1,
                            description=current_user.description)
+
+
+@app.route("/gallery")
+@login_required
+def gallery():
+    descriptions = [user.description for user in User.query.all()]
+    shuffle(descriptions)
+
+    return render_template('gallery.html', active=0,
+                           descriptions=descriptions)
 
 
 @app.route("/signup", methods=['GET', 'POST'])

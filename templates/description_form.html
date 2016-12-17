@@ -1,41 +1,50 @@
 <div class="row">
     <div class="col-md-12">
-        <table class="table table-hover">
-            <tbody>
-                <tr>
-                    <td>{{_('Which famous person (fictional or real) describes you the best?') }}</td>
-                    <td>
-                        <a href="{{ description.person }}">
-                            <img src="{{ description.person }}"/>
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>{{_('What does a perfect saturday evening look like
-                        for you?') }}</td>
-                    <td>
-                        <a href="{{ description.saturday }}">
-                            <img src="{{ description.saturday }}"/>
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>{{_('Where would you like to be right now?') }}</td>
-                    <td>
-                        <a href="{{ description.place}}">
-                            <img src="{{ description.place }}"/>
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>{{_('What is your favourite quote?') }}</td>
-                    <td>{{_(description.quote) }}</td>
-                </tr>
-                <tr>
-                    <td>{{_('What background theme should play in your life?') }}</td>
-                    <td>{{_(description.theme) }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <p class="lead">{{_('Which famous person (fictional or real)
+        describes you the best?') }}
+        </p>
+        <a href="{{ description.person }}">
+            <img src="{{ description.person }}"/>
+        </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <p class="lead">{{_('What does a perfect saturday evening look like
+        for you?') }}
+        </p>
+        <a href="{{ description.saturday }}">
+            <img src="{{ description.saturday }}"/>
+        </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <p class="lead">
+        {{_('Where would you like to be right now?') }}
+        </p>
+        <a href="{{ description.place}}">
+            <img src="{{ description.place }}"/>
+        </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <p class="lead">
+        {{_('What is your favourite quote?') }}
+        </p>
+        <p>
+        {{_(description.quote) }}
+        </p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <p class="lead">
+        {{_('What background theme should play in your life?') }}
+        </p>
+        <p>
+        {{_(description.theme) }}
+        </p>
     </div>
 </div>
