@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %} {{_('Gallery')}} {% endblock %}
+{% block content %}
+<script
+src="https://code.jquery.com/jquery-3.1.1.min.js"
+integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+crossorigin="anonymous"></script>
+<script type="text/javascript"
+        src="//cdn.jsdelivr.net/jquery.slick/1.6.0/slick.min.js"></script>
+<script>
+$(document).ready(function(){
+    $('.gallery-item').slick({
+        infinite: false,
+        arrows: true
+    });
+});
+</script>
+<center>
+    <div class="gallery-item">
+        {% for description in descriptions %}
+        <div>
+        {% include 'description_form.html' %}
+        </div>
+        {% endfor %}
+    </div>
+</center>
+{% endblock %}

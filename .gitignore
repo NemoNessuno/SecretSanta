@@ -91,4 +91,5 @@ ENV/
 # The current database
 database.db
 
+*.swp
 nohup.out

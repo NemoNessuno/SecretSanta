@@ -74,7 +74,7 @@ def index():
         return redirect(url_for('description'))
 
     elif len(form.errors) > 0:
-            print_errors(form)
+        print_errors(form)
 
     return render_template('index.html', active=0, form=form,
                            description=current_user.other_description)
