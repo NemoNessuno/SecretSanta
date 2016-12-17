@@ -43,6 +43,15 @@ def random_derangement(n):
             if v[0] != 0:
                 return tuple(v)
 
+
+def stats():
+    for user in User.query.all():
+        print "EMail:" + user.email
+        print "Description: " + str(user.description)
+        print "ODescription: " + str(user.other_description)
+        print "\n"
+
+
 # If this is called via python db_handler.py setup the db
 if __name__ == "__main__":
     # import all modules here that might define models so that
@@ -61,6 +70,9 @@ if __name__ == "__main__":
             shuffle()
             success = True
             print 'Successfully initialized'
+        elif args[1] == 'stats':
+            stats()
+            print len(User.query.all())
 
     if not success:
         print """Please type 'init' to (re)initialize the database or 'shuffle'

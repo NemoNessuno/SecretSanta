@@ -90,3 +90,5 @@ ENV/
 
 # The current database
 database.db
+
+nohup.out
