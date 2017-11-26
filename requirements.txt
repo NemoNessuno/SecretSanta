@@ -1,0 +1,6 @@
+Flask
+Flask-Login
+SQLAlchemy
+bcrypt
+Flask_Babel
+Flask_WTF
