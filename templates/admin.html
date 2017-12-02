@@ -1,16 +1,5 @@
 {% extends "layout.html" %}
-{% block title %} {{_('Home')}} {% endblock %}
+{% block title %} {{_('Admin')}} {% endblock %}
 {% block content %}
-<center>
-  <p class="lead"></p>
-  {% with messages = get_flashed_messages() %}
-  {% if messages %}
-  <div class="alert alert-danger" role="alert">
-    {% for message in messages %}
-    <p>{{ message }}</p>
-    {% endfor %}
-  </div>
-  {% endif %}
-  {% endwith %}
-</center>
+Keks
 {% endblock %}

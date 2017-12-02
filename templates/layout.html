@@ -35,10 +35,22 @@
     </nav>
     <h3 class="text-muted">Secret Santa</h3>
   </div>
-  <div class="jumbotron">
-    {% block content %}
-    {% endblock %}
+  <p class="lead"></p>
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <div class="alert alert-danger" role="alert">
+    {% for message in messages %}
+    <div class="row justify-content-md-center">{{ message }}</div>
+    {% endfor %}
   </div>
+  {% endif %}
+  {% endwith %}
+  <main role="main">
+    <div class="jumbotron">
+      {% block content %}
+      {% endblock %}
+    </div>
+  </main>
 </div>
 </body>
 </html>

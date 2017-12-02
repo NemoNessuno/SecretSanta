@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block title %} {{_('Become a Secret Santa')}} {% endblock %}
 {% block content %}
-<p class="lead"></p>
 <div class="row">
   <div class="col-md-12">
     <h3>{{_('Become a Secret Santa')}}</h3>
@@ -9,15 +8,6 @@
 </div>
 
 <center>
-  {% with messages = get_flashed_messages() %}
-  {% if messages %}
-  <div class="alert alert-danger" role="alert">
-    {% for message in messages %}
-    <p>{{ message }}</p>
-    {% endfor %}
-  </div>
-  {% endif %}
-  {% endwith %}
   <form action="{{ url_for('signup') }}" method="post">
     {{ form.csrf_token }}
     {% for field in form if field.widget.input_type != 'hidden' %}

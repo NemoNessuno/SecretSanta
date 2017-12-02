@@ -1,21 +1,9 @@
 {% extends "layout.html" %}
 {% block title %} {{_('Home')}} {% endblock %}
 {% block content %}
-<center>
-  <p class="lead"></p>
-  {% with messages = get_flashed_messages() %}
-  {% if messages %}
-  <div class="alert alert-danger" role="alert">
-    {% for message in messages %}
-    <p>{{ message }}</p>
-    {% endfor %}
+<div class="row">
+  <div class="col-md-12">
+    Put form here.
   </div>
-  {% endif %}
-  {% endwith %}
-  <div class="row">
-    <div class="col-md-12">
-      Put form here.
-    </div>
-  </div>
-</center>
+</div>
 {% endblock %}
