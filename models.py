@@ -1,7 +1,8 @@
-import enum as enum
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Date, Enum, Table
+
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Date, Table, Enum
 from sqlalchemy.orm import validates, relationship
+
 from db_handler import Base
 from password import Password
 
@@ -70,15 +71,15 @@ class Participation(Base):
 
 description_questions = Table(
     'association', Base.metadata,
-    Column('description_id', Integer, ForeignKey('description.id')),
-    Column('question_id', Integer, ForeignKey('question.id'))
+    Column('description_id', Integer, ForeignKey('descriptions.id')),
+    Column('question_id', Integer, ForeignKey('questions.id'))
 )
 
 
 class Description(Base):
     __tablename__ = 'descriptions'
     id = Column('id', Integer, primary_key=True)
-    user_id = Column(String(120), ForeignKey('user.email'))
+    user_id = Column(String(120), ForeignKey('users.email'))
     user = relationship("User", foreign_keys=[user_id])
     questions = relationship("Question", secondary=description_questions)
 
@@ -89,19 +90,13 @@ class Description(Base):
         self.questions = questions
 
 
-class QuestionType(enum.Enum):
-    text = 1,
-    picture = 2,
-    sound = 3
-
-
 class Question(Base):
     __tablename__ = 'questions'
     id = Column('id', Integer, primary_key=True)
     text = Column(String(256))
-    q_type = Column('type', Enum(QuestionType))
+    q_type = Column('type', Enum('text', 'image', 'sound'))
 
-    def __init__(self, text=None, q_type=QuestionType.text):
+    def __init__(self, text=None, q_type='text'):
         self.text = text
         self.q_type = q_type
 
