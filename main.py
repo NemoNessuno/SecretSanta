@@ -1,11 +1,13 @@
+from random import shuffle
+
 from flask import Flask, render_template, redirect, url_for, flash
+from flask_babel import Babel, gettext
 from flask_login import LoginManager, login_required, \
     login_user, logout_user, current_user
-from models import User, Description
+
 from db_handler import db_session
-from flask_babel import Babel, gettext
-from forms import LoginForm, SignUpForm, DescriptionForm
-from random import shuffle
+from forms import LoginForm, SignUpForm
+from models import User, Round, Participation
 
 # Initialize the base app and load the config
 app = Flask(__name__)
@@ -60,24 +62,18 @@ def login():
 @app.route("/", methods=['GET', 'POST'])
 @login_required
 def index():
-    form = DescriptionForm(obj=current_user.description)
-    if form.validate_on_submit():
-        if not current_user.description:
-            current_user.description = Description()
+    cur_rounds = db_session.query(Round).filter(Round.running).all()
+    if len(cur_rounds) > 0:
+        participation = db_session.query(Participation).filter(Participation.round_id == cur_rounds[0].id)
+    else:
+        flash(gettext("There is currently no active round!"))
+    return render_template('index.html', active=0)
 
-        current_user.description.person = form.person.data
-        current_user.description.place = form.place.data
-        current_user.description.theme = form.theme.data
-        current_user.description.quote = form.quote.data
-        current_user.description.saturday = form.saturday.data
-        db_session.commit()
-        return redirect(url_for('description'))
 
-    elif len(form.errors) > 0:
-        print_errors(form)
-
-    return render_template('index.html', active=0, form=form,
-                           description=current_user.other_description)
+@app.route("/admin")
+@login_required
+def admin():
+    return render_template('admin.html', active=-1)
 
 
 @app.route("/description")
@@ -124,4 +120,5 @@ def print_errors(form):
 
 
 if __name__ == "__main__":
+    app.debug = True
     app.run(host='0.0.0.0')

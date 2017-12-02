@@ -57,6 +57,8 @@ class Round(Base):
 class Participation(Base):
     __tablename__ = 'participations'
     id = Column(Integer, primary_key=True)
+    round_id = Column(Integer, ForeignKey('rounds.id'))
+    cur_round = relationship("Round", foreign_keys=[round_id])
     description_id = Column(Integer, ForeignKey('descriptions.id'))
     description = relationship("Description", foreign_keys=[description_id])
     other_description_id = Column(Integer, ForeignKey('descriptions.id'))
