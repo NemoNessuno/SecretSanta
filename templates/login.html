@@ -3,27 +3,27 @@
 {% block content %}
 <p class="lead"></p>
 <center>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <div class="alert alert-danger" role="alert">
-        {% for message in messages %}
-        <p>{{ message }}</p>
-        {% endfor %}
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <div class="alert alert-danger" role="alert">
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+  <form action="{{ url_for('login') }}" method="post">
+    {{ form.csrf_token }}
+    {% for field in form if field.widget.input_type != 'hidden' %}
+    <div class="form-group">
+      {{ field.label }}
+      {{ field(class_="form-control") }}
     </div>
-    {% endif %}
-    {% endwith %}
-    <form action="{{ url_for('login') }}" method="post">
-        {{ form.csrf_token }}
-        {% for field in form if field.widget.input_type != 'hidden' %}
-        <div class="form-group">
-            {{ field.label }} 
-            {{ field(class_="form-control") }}
-        </div>
-        {% endfor %}
-        <input type='submit' value={{_('Login')}} class='btn
+    {% endfor %}
+    <input type='submit' value={{_('Login')}} class='btn
         btn-primary btn-lg'/>
-        <a href="signup" class="btn btn-success btn-lg">{{_("Sign Up")}}</a>
-        </div>
-    </form>
+    <a href="signup" class="btn btn-success btn-lg">{{_("Sign Up")}}</a>
+    </div>
+  </form>
 </center>
 {% endblock %}
