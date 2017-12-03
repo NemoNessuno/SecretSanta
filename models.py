@@ -30,13 +30,15 @@ class User(Base):
     def is_authenticated(self):
         return self.validated
 
+    def is_admin(self):
+        return self.admin
+
     def is_anonymous(self):
         return False
 
-    def __init__(self, email=None, contribution=None, description=None):
+    def __init__(self, email=None, admin=False):
         self.email = email
-        self.contribution = contribution
-        self.description = description
+        self.admin = admin
         self.validated = False
 
     def __repr__(self):
@@ -49,7 +51,7 @@ class Round(Base):
     running = Column(Boolean)
     created_at = Column(Date)
 
-    def __init__(self, running=True, created_at=datetime.now):
+    def __init__(self, running=True, created_at=datetime.now()):
         self.running = running
         self.created_at = created_at
 
@@ -65,7 +67,8 @@ class Participation(Base):
     other_description = relationship("Description", foreign_keys=[other_description_id])
     eligible = Column(Boolean)
 
-    def __init__(self, description=None, other_description=None, eligible=False):
+    def __init__(self, cur_round=None, description=None, other_description=None, eligible=False):
+        self.cur_round = cur_round
         self.description = description
         self.other_description = other_description
         self.eligible = eligible
@@ -90,6 +93,9 @@ class Description(Base):
             questions = []
         self.user = user
         self.questions = questions
+
+    def is_filled(self):
+        return len(self.questions) > 0 and all([len(question.text) > 0 for question in self.questions])
 
 
 class Question(Base):

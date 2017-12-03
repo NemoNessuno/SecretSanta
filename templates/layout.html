@@ -8,11 +8,12 @@
   <link href="{{ url_for('static', filename='css/slick.css') }}" rel="stylesheet" type="text/css">
   <link href="{{ url_for('static', filename='css/slick-theme.css') }}" rel="stylesheet" type="text/css">
   <script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
 </head>
 <body>
 <div class="container">
   <div class="header clearfix">
-    <nav>
+    <nav role="navigation">
       <ul class="nav nav-pills float-right">
         {% if active > -1 %}
         <li class="nav-item">
@@ -46,7 +47,7 @@
   {% endif %}
   {% endwith %}
   <main role="main">
-    <div class="jumbotron">
+    <div {% if active !=2 %} class="jumbotron" {% endif %}>
       {% block content %}
       {% endblock %}
     </div>

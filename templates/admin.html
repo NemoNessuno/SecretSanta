@@ -1,5 +1,107 @@
 {% extends "layout.html" %}
 {% block title %} {{_('Admin')}} {% endblock %}
 {% block content %}
-Keks
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#current" role="tab">Current Round</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#former" role="tab">Former Rounds</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#questions" role="tab">Questions</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#user" role="tab">User</a>
+  </li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content p-1">
+  <div class="tab-pane active" id="current" role="tabpanel">
+    <div class="row">
+      <div class="col-8">
+        {% if current_round is not none%}
+        <h3>Round startet at {{ current_round.created_at }}</h3>
+      </div>
+      <div class="col-4">
+        <a class="btn btn-danger btn-sm" href="/add_round" role="button">End Round</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col"><h4>Participations</h4></div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <table class="table table-hover">
+          <thead class="thead-default">
+          <tr>
+            <th>User</th>
+            <th>Eligible</th>
+            <th>Filled</th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for participation in participations%}
+          <tr>
+            <td>
+              {{ participation.description.user.email }}
+            </td>
+            <td>
+              {{ participation.eligible }}
+            </td>
+            <td>
+              {{ participation.description.is_filled() }}
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <p>There is currently no active round!</p>
+    <div class="row">
+      <div class="col">
+        <a class="btn btn-success btn-sm" href="/add_round" role="button">Add Round</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  <div class="tab-pane" id="former" role="tabpanel">{{rounds}}</div>
+  <div class="tab-pane" id="questions" role="tabpanel">{{questions}}</div>
+  <div class="tab-pane" id="user" role="tabpanel">
+    <table class="table table-hover">
+      <thead class="thead-default">
+      <tr>
+        <th>Id</th>
+        <th>Admin</th>
+        <th><p>&nbsp;</p></th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for user in users%}
+      <tr>
+        <td>{{ user.email }}</td>
+        <td>
+          <a class="btn btn-{% if user.admin %}danger{% else %}success{% endif %} btn-sm"
+             href="/edit_user?action=admin&mail={{user.email}}"
+             role="button">
+            Toggle Admin
+          </a>
+        </td>
+        <td>
+          <a class="btn btn-danger btn-sm"
+             href="/edit_user?action=delete&mail={{user.email}}"
+             role="button">
+            Remove User
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}
