@@ -14,6 +14,7 @@ Base.query = db_session.query_property()
 
 
 def init_db():
+    from models import User, Description, Round, Participation, description_questions, Question, Answer
     User.__table__.create(bind=engine)
     Round.__table__.create(bind=engine)
     Participation.__table__.create(bind=engine)
@@ -62,7 +63,6 @@ if __name__ == "__main__":
     # import all modules here that might define models so that
     # they will be registered properly on the metadata.  Otherwise
     # you will have to import them first before calling init_db()
-    from models import User, Description, Round, Participation, description_questions, Question, Answer
 
     args = sys.argv
     success = False
