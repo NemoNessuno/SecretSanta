@@ -20,6 +20,7 @@ def init_db():
     description_questions.create(bind=engine)
     Description.__table__.create(bind=engine)
     Question.__table__.create(bind=engine)
+    Answer.__table__.create(bind=engine)
     db_session.commit()
 
 
@@ -61,7 +62,7 @@ if __name__ == "__main__":
     # import all modules here that might define models so that
     # they will be registered properly on the metadata.  Otherwise
     # you will have to import them first before calling init_db()
-    from models import User, Description, Round, Participation, description_questions, Question
+    from models import User, Description, Round, Participation, description_questions, Question, Answer
 
     args = sys.argv
     success = False
@@ -79,5 +80,4 @@ if __name__ == "__main__":
             print len(User.query.all())
 
     if not success:
-        print """Please type 'init' to (re)initialize the database or 'shuffle'
-to shuffle the descriptions."""
+        print """Please type 'init' to (re)initialize the database or 'shuffle' to shuffle the descriptions."""

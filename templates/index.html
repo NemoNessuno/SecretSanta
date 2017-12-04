@@ -1,9 +1,37 @@
 {% extends "layout.html" %}
 {% block title %} {{_('Home')}} {% endblock %}
 {% block content %}
-<div class="row">
-  <div class="col-md-12">
-    Put form here.
+{% if participation is none %}
+<div>
+  <div class="alert alert-warning" role="alert">
+    {{ _('There is no round at the moment!') }}
+  </div>
+</div>
+{% elif not participation.eligible %}
+<div class="card">
+  <div class="card-header">
+    {{_('Welcome to the current round of SecretSanta.')}}
+  </div>
+  <div class="card-body">
+    <h4 class="card-title">{{ _('Please enter your question below.') }}</h4>
+    <form action="{{ url_for('add_question') }}" method="post">
+      {{ form.csrf_token }}
+      {% for field in form if field.widget.input_type != 'hidden' %}
+      <div class="form-group">
+        {{ field.label }}
+        {{ field(class_="form-control") }}
+      </div>
+      {% endfor %}
+      <div class="form-group">
+        <input type='submit' value="{{_('Post Question')}}" class='btn btn-primary'/>
+      </div>
+    </form>
+    {% else %}
+    <div class="alert alert-success" role="alert">
+      <h4 class="alert-heading">{{ _('Well done!') }}</h4>
+      <p>{{ _('You are eligible to participate. Please wait until the round has been set up.') }}</p>
+    </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

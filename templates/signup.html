@@ -7,19 +7,17 @@
   </div>
 </div>
 
-<center>
-  <form action="{{ url_for('signup') }}" method="post">
-    {{ form.csrf_token }}
-    {% for field in form if field.widget.input_type != 'hidden' %}
-    <div class="form-group">
-      {{ field.label }}
-      {{ field(class_="form-control") }}
-    </div>
-    {% endfor %}
-    <div class="form-group">
-      <input type='submit' value="{{_('Sign Up')}}" class='btn
+<form action="{{ url_for('signup') }}" method="post">
+  {{ form.csrf_token }}
+  {% for field in form if field.widget.input_type != 'hidden' %}
+  <div class="form-group">
+    {{ field.label }}
+    {{ field(class_="form-control") }}
+  </div>
+  {% endfor %}
+  <div class="form-group">
+    <input type='submit' value="{{_('Sign Up')}}" class='btn
             btn-primary btn-lg'/>
-    </div>
-  </form>
-</center>
+  </div>
+</form>
 {% endblock %}

@@ -1,8 +1,8 @@
+from flask_babel import gettext
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField
 from wtforms.validators import InputRequired, Email, EqualTo, URL, \
     ValidationError
-from flask_babel import gettext
 
 
 class ImageURL(URL):
@@ -36,24 +36,11 @@ class SignUpForm(FlaskForm):
                             validators=[InputRequired()])
 
 
-class DescriptionForm(FlaskForm):
-    person = StringField(gettext(
-        'Which famous person (fictional or real) describes you the best?'),
-        validators=[InputRequired(), ImageURL()],
-        render_kw={"placeholder": gettext('Please enter a valid image url.')})
-    saturday = StringField(gettext(
-        'What does a perfect saturday evening look like for you?'),
-        validators=[InputRequired(), ImageURL()],
-        render_kw={"placeholder": gettext('Please enter a valid image url.')})
-    place = StringField(gettext('Where would you like to be right now?'),
-                        validators=[InputRequired(), ImageURL()],
-                        render_kw={"placeholder":
-                                   gettext('Please enter a valid image url.')})
-    quote = StringField(gettext('What is your favourite quote?'),
-                        validators=[InputRequired()])
-    theme = StringField(gettext(
-        'What background theme should play in your life?'),
-        validators=[InputRequired()])
+class QuestionForm(FlaskForm):
+    text = StringField(gettext('Question'),
+                       validators=[InputRequired()],
+                       render_kw={"placeholder": gettext('Enter your question here.')})
+    q_type = SelectField(gettext('Type'), choices=[('text', 'Text'), ('image', 'Image'), ('sound', 'Sound')])
 
 
 class ContributionForm(FlaskForm):

@@ -47,10 +47,8 @@
   {% endif %}
   {% endwith %}
   <main role="main">
-    <div {% if active !=2 %} class="jumbotron" {% endif %}>
-      {% block content %}
-      {% endblock %}
-    </div>
+    {% block content %}
+    {% endblock %}
   </main>
 </div>
 </body>

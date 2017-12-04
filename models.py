@@ -87,6 +87,7 @@ class Description(Base):
     user_id = Column(String(120), ForeignKey('users.email'))
     user = relationship("User", foreign_keys=[user_id])
     questions = relationship("Question", secondary=description_questions)
+    answers = []
 
     def __init__(self, user=None, questions=None):
         if questions is None:
@@ -108,3 +109,17 @@ class Question(Base):
         self.text = text
         self.q_type = q_type
 
+
+class Answer(Base):
+    __tablename__ = 'answers'
+    id = Column('id', Integer, primary_key=True)
+    description_id = Column(Integer, ForeignKey('descriptions.id'))
+    description = relationship("Description", foreign_keys=[description_id])
+    question_id = Column(Integer, ForeignKey('questions.id'))
+    question = relationship("Question", foreign_keys=[question_id])
+    text = Column(String(256))
+
+    def __init__(self, description=None, question=None, text=None):
+        self.description = description
+        self.question = question
+        self.text = text

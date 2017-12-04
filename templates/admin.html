@@ -26,7 +26,7 @@
         <h3>Round startet at {{ current_round.created_at }}</h3>
       </div>
       <div class="col-4">
-        <a class="btn btn-danger btn-sm" href="/add_round" role="button">End Round</a>
+        <a class="btn btn-danger btn-sm float-right" href="/add_round" role="button">End Round</a>
       </div>
     </div>
     <div class="row">
@@ -70,7 +70,40 @@
     {% endif %}
   </div>
   <div class="tab-pane" id="former" role="tabpanel">{{rounds}}</div>
-  <div class="tab-pane" id="questions" role="tabpanel">{{questions}}</div>
+  <div class="tab-pane" id="questions" role="tabpanel">
+    <table class="table table-hover">
+      <thead class="thead-default">
+      <tr>
+        <th>Text</th>
+        <th>Type</th>
+        <th><p>&nbsp;</p></th>
+        <th><p>&nbsp;</p></th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for question in questions%}
+      <tr>
+        <td>{{ question.text }}</td>
+        <td>{{ question.q_type }}</td>
+        <td>
+          <a class="btn btn-success btn-sm"
+             href="/edit_user?action=admin&id={{question.id}}"
+             role="button">
+            Toggle Question Usage
+          </a>
+        </td>
+        <td>
+          <a class="btn btn-danger btn-sm"
+             href="/edit_question?action=delete&id={{question.id}}"
+             role="button">
+            Remove Question
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
   <div class="tab-pane" id="user" role="tabpanel">
     <table class="table table-hover">
       <thead class="thead-default">

@@ -8,7 +8,7 @@ from flask_login import LoginManager, login_required, \
     login_user, logout_user, current_user
 
 from db_handler import db_session
-from forms import LoginForm, SignUpForm
+from forms import LoginForm, SignUpForm, QuestionForm
 from models import User, Round, Participation, Question, Description
 
 # Initialize the base app and load the config
@@ -74,25 +74,59 @@ def login():
 @app.route("/", methods=['GET', 'POST'])
 @login_required
 def index():
-    cur_rounds = get_cur_round()
-    if len(cur_rounds) > 0:
-        participations = db_session.query(Participation).filter(Participation.round_id == cur_rounds[0].id).all()
-        if not any([participation.description.user_id == current_user.email for participation in participations]):
-            db_session.add(
-                Participation(
-                    cur_round=cur_rounds[0],
-                    description=Description(
-                        user=current_user)
-                ))
+    cur_round = get_cur_round()
+    form = None
+    if cur_round is not None:
+        participation = get_cur_participation(cur_round.id)
+
+        if participation is None:
+            participation = Participation(
+                cur_round=cur_round,
+                description=Description(
+                    user=current_user)
+            )
+            db_session.add(participation)
             db_session.commit()
+
+        if not participation.eligible:
+            form = QuestionForm()
     else:
         flash(gettext("There is currently no active round!"))
-    return render_template('index.html', active=0)
+    return render_template('index.html', active=0, participation=participation, form=form)
+
+
+def get_cur_participation(cur_rounds_id):
+    participations = db_session.query(Participation).filter(Participation.round_id == cur_rounds_id).all()
+    participation = next(
+        ifilter(lambda part: part.description.user_id == current_user.email,
+                participations), None)
+    return participation
+
+
+@app.route("/add_question", methods=['GET', 'POST'])
+@login_required
+def add_question():
+    cur_round = get_cur_round()
+
+    if cur_round is not None:
+        form = QuestionForm()
+        if form.validate_on_submit():
+            db_session.add(Question(form.text.data, form.q_type.data))
+            get_cur_participation(cur_round.id).eligible = True
+            db_session.commit()
+        else:
+            print_errors(form)
+
+    return redirect(url_for('index'))
 
 
 def get_cur_round():
     cur_rounds = db_session.query(Round).filter(Round.running).all()
-    return cur_rounds
+
+    if len(cur_rounds) > 0:
+        return cur_rounds[0]
+    else:
+        return None
 
 
 @app.route("/admin")
