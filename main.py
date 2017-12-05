@@ -7,7 +7,7 @@ from flask_babel import Babel, gettext
 from flask_login import LoginManager, login_required, \
     login_user, logout_user, current_user
 
-from db_handler import db_session, init_db
+from db_handler import db_session, init_db, engine
 from forms import LoginForm, SignUpForm, QuestionForm
 from models import User, Round, Participation, Question, Description
 
@@ -30,14 +30,7 @@ def close_db(exception=None):
 
 @login_manager.user_loader
 def user_loader(identifier):
-    user = None
-    try:
-        user = User.query.get(identifier)
-    except Exception:
-        flash(gettext("No user table found. Automatically tried to initialize the database."), "warning")
-        init_db()
-
-    return user
+    return User.query.get(identifier)
 
 
 @login_manager.unauthorized_handler
@@ -232,5 +225,8 @@ def print_errors(form):
 
 
 if __name__ == "__main__":
+    if not User.__table__.exists(bind=engine):
+        init_db()
+
     app.debug = True
     app.run(host='0.0.0.0')
