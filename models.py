@@ -45,11 +45,19 @@ class User(Base):
         return '<User %r>' % self.email
 
 
+round_questions = Table(
+    'associations', Base.metadata,
+    Column('round_id', Integer, ForeignKey('rounds.id')),
+    Column('question_id', Integer, ForeignKey('questions.id'))
+)
+
+
 class Round(Base):
     __tablename__ = 'rounds'
     id = Column(Integer, primary_key=True)
     running = Column(Boolean)
     created_at = Column(Date)
+    questions = relationship("Question", secondary=round_questions)
 
     def __init__(self, running=True, created_at=datetime.now()):
         self.running = running
@@ -74,19 +82,11 @@ class Participation(Base):
         self.eligible = eligible
 
 
-description_questions = Table(
-    'association', Base.metadata,
-    Column('description_id', Integer, ForeignKey('descriptions.id')),
-    Column('question_id', Integer, ForeignKey('questions.id'))
-)
-
-
 class Description(Base):
     __tablename__ = 'descriptions'
     id = Column('id', Integer, primary_key=True)
     user_id = Column(String(120), ForeignKey('users.email'))
     user = relationship("User", foreign_keys=[user_id])
-    questions = relationship("Question", secondary=description_questions)
     answers = []
 
     def __init__(self, user=None, questions=None):
