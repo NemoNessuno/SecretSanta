@@ -43,6 +43,5 @@ class QuestionForm(FlaskForm):
     q_type = SelectField(gettext('Type'), choices=[('text', 'Text'), ('image', 'Image'), ('sound', 'Sound')])
 
 
-class ContributionForm(FlaskForm):
-    contribution = SelectField(gettext('Contribution'),
-                               choices=[('choice1', 'choice1')])
+class DescriptionForm(FlaskForm):
+    pass

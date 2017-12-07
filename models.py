@@ -96,7 +96,7 @@ class Description(Base):
         self.questions = questions
 
     def is_filled(self):
-        return len(self.questions) > 0 and all([len(question.text) > 0 for question in self.questions])
+        return False
 
 
 class Question(Base):

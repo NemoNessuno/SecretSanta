@@ -26,12 +26,56 @@
         <input type='submit' value="{{_('Post Question')}}" class='btn btn-primary'/>
       </div>
     </form>
-    {% else %}
-    <div class="alert alert-success" role="alert">
-      <h4 class="alert-heading">{{ _('Well done!') }}</h4>
-      <p>{{ _('You are eligible to participate. Please wait until the round has been set up.') }}</p>
-    </div>
-    {% endif %}
   </div>
 </div>
+{% else %}
+{% if form is none %}
+<div class="alert alert-success" role="alert">
+  <h4 class="alert-heading">{{ _('Well done!') }}</h4>
+  <p>{{ _('You are eligible to participate. Please wait until the round has been set up.') }}</p>
+</div>
+{% else %}
+<div class="card">
+  <div class="card-header">
+    {{_('The current round has begun.')}}
+  </div>
+  <div class="card-body">
+    <h4 class="card-title">{{ _('Please answer the questions below.') }}</h4>
+    <form action="{{ url_for('description') }}" method="post" enctype="multipart/form-data">
+      {{ form.csrf_token }}
+      {% for field in form if field.widget.input_type != 'hidden' %}
+      <div class="form-group">
+        {{ field.label }}
+        <div class="form-control">
+          {{ field() }}
+          {% if field.description == 'image' %}
+          {% if field.default %}
+          <p>&nbsp;</p>
+          <p><strong>{{_('Preview of current answer:')}}</strong></p>
+          <img class="object-fit-preview-image" src="/uploads/{{field.default}}"/>
+          {% endif %}
+          {% elif field.description == 'sound' %}
+          {% if field.default %}
+          <p>&nbsp;</p>
+          <p><strong>{{_('Preview of current answer:')}}</strong></p>
+          <div>
+            <audio controls>
+              <source src="/uploads/{{field.default}}">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+          {% endif %}
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+      <div class="form-group">
+        <input type='submit' value="{{_('Submit')}}" class='btn btn-primary'/>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endif %}
+
 {% endblock %}

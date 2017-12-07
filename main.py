@@ -1,15 +1,20 @@
+import os
+import uuid
 from functools import wraps
-from itertools import ifilter
 from random import shuffle
 
-from flask import Flask, render_template, redirect, url_for, flash, request
+from flask import Flask, render_template, redirect, url_for, flash, request, send_from_directory
 from flask_babel import Babel, gettext
 from flask_login import LoginManager, login_required, \
     login_user, logout_user, current_user
+from flask_wtf import FlaskForm
 
-from db_handler import db_session, init_db, engine
+import helper
+from admin import handle_admin, handle_edit_user
+from config import ALLOWED_EXTENSIONS
+from db_handler import db_session, init_db
 from forms import LoginForm, SignUpForm, QuestionForm
-from models import User, Round, Participation, Question, Description
+from models import User, Round, Participation, Question, Description, Answer
 
 # Initialize the base app and load the config
 app = Flask(__name__)
@@ -74,11 +79,11 @@ def login():
 @app.route("/", methods=['GET', 'POST'])
 @login_required
 def index():
-    cur_round = get_cur_round()
+    cur_round = helper.get_cur_round()
     form = None
     participation = None
     if cur_round is not None:
-        participation = get_cur_participation(cur_round.id)
+        participation = helper.get_cur_participation(cur_round.id)
 
         if participation is None:
             participation = Participation(
@@ -91,29 +96,23 @@ def index():
 
         if not participation.eligible:
             form = QuestionForm()
+        else:
+            form = helper.build_description_form(cur_round, helper.get_cur_participation(cur_round.id).description)
     else:
         flash(gettext("There is currently no active round!"))
     return render_template('index.html', active=0, participation=participation, form=form)
 
 
-def get_cur_participation(cur_rounds_id):
-    participations = db_session.query(Participation).filter(Participation.round_id == cur_rounds_id).all()
-    participation = next(
-        ifilter(lambda part: part.description.user_id == current_user.email,
-                participations), None)
-    return participation
-
-
 @app.route("/add_question", methods=['GET', 'POST'])
 @login_required
 def add_question():
-    cur_round = get_cur_round()
+    cur_round = helper.get_cur_round()
 
     if cur_round is not None:
         form = QuestionForm()
         if form.validate_on_submit():
             db_session.add(Question(form.text.data, form.q_type.data))
-            get_cur_participation(cur_round.id).eligible = True
+            helper.get_cur_participation(cur_round.id).eligible = True
             db_session.commit()
         else:
             print_errors(form)
@@ -121,41 +120,18 @@ def add_question():
     return redirect(url_for('index'))
 
 
-def get_cur_round():
-    cur_rounds = db_session.query(Round).filter(Round.running).all()
-
-    if len(cur_rounds) > 0:
-        return cur_rounds[0]
-    else:
-        return None
-
-
 @app.route("/admin")
 @admin_required
 @login_required
 def admin():
-    rounds = db_session.query(Round).all()
-    questions = db_session.query(Question).all()
-    users = db_session.query(User).all()
-    current_round = next(ifilter(lambda cur_round: cur_round.running, rounds), None)
-
-    participations = []
-    if current_round is not None:
-        participations = db_session.query(Participation).filter(Participation.round_id == current_round.id).all()
-
-    return render_template('admin.html', active=2,
-                           rounds=rounds,
-                           participations=participations,
-                           current_round=current_round,
-                           questions=questions,
-                           users=users)
+    return handle_admin()
 
 
 @app.route("/add_round")
 @admin_required
 @login_required
 def add_round():
-    if get_cur_round() is None:
+    if helper.get_cur_round() is None:
         db_session.add(Round())
         db_session.commit()
 
@@ -166,25 +142,92 @@ def add_round():
 @admin_required
 @login_required
 def edit_user():
-    action = request.args.get('action')
-    user = db_session.query(User).filter(User.email == request.args.get('mail'))[0]
+    return handle_edit_user()
 
-    if user.email != current_user.email:
-        if action == 'admin':
-            user.admin = not user.admin
-            db_session.commit()
-        elif action == 'delete':
-            db_session.delete(user)
-            db_session.commit()
+
+@app.route("/edit_question")
+@admin_required
+@login_required
+def edit_question():
+    action = request.args.get('action')
+    question = db_session.query(Question).filter(Question.id == request.args.get('id'))[0]
+    cur_round = helper.get_cur_round()
+
+    if action == 'use':
+        if question in cur_round.questions:
+            cur_round.questions.remove(question)
+        else:
+            cur_round.questions.append(question)
+
+        db_session.commit()
+    elif action == 'delete':
+        db_session.delete(question)
+        db_session.commit()
 
     return redirect(url_for('admin'))
 
 
-@app.route("/description")
+def file_suffix(filename):
+    return filename.rsplit('.', 1)[1].lower()
+
+
+def allowed_file(filename):
+    return '.' in filename and file_suffix(filename) in ALLOWED_EXTENSIONS
+
+
+@app.route("/description", methods=['GET', 'POST'])
 @login_required
 def description():
-    return render_template('description.html', active=1,
-                           description=current_user.description)
+    form = FlaskForm()
+    cur_round = helper.get_cur_round()
+    if cur_round is None:
+        return redirect(url_for('index'))
+
+    cur_participation = helper.get_cur_participation(cur_round.id)
+    if cur_participation is None:
+        return redirect(url_for('index'))
+
+    if form.validate_on_submit():
+        form = request.form
+        files = request.files
+        for question in [question for question in form if question.startswith('question')]:
+            if form[question] != '':
+                q_id = question.rsplit('_', 1)[1]
+                answer = helper.get_answer(cur_participation.description.id, q_id)
+                if answer is None:
+                    cur_question = db_session.query(Question).filter(Question.id == q_id).first()
+                    answer = Answer(description=cur_participation.description, question=cur_question)
+                    db_session.add(answer)
+
+                answer.text = form[question]
+                db_session.commit()
+
+        for file_field in files:
+            u_file = files[file_field]
+            if u_file.filename != '':
+                q_id = file_field.rsplit('_', 1)[1]
+                answer = helper.get_answer(cur_participation.description.id, q_id)
+                if answer is None:
+                    cur_question = db_session.query(Question).filter(Question.id == q_id).first()
+                    answer = Answer(description=cur_participation.description, question=cur_question)
+                    db_session.add(answer)
+
+                filename = str(uuid.uuid4())
+                new_filename = "{}.{}".format(filename, file_suffix(u_file.filename))
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], new_filename)
+                u_file.save(file_path)
+
+                answer.text = new_filename
+                db_session.commit()
+
+    else:
+        print_errors(form)
+    return redirect(url_for('index'))
+
+
+@app.route('/uploads/<filename>')
+def send_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route("/gallery")
@@ -225,8 +268,7 @@ def print_errors(form):
 
 
 if __name__ == "__main__":
-    if not User.__table__.exists(bind=engine):
-        init_db()
+    init_db()
 
     app.debug = True
     app.run(host='0.0.0.0')

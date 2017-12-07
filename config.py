@@ -5,6 +5,10 @@ SECRET_KEY = 'SecretSantaSecretPassPhrase'
 # ...
 # available languages
 LANGUAGES = {
-        'en': 'English',
-        'de': 'Deutsch'
+    'en': 'English',
+    'de': 'Deutsch'
 }
+images = ['png', 'jpg', 'jpeg', 'gif']
+sounds = ['mp3', 'wav', 'mkv', 'midi', 'ogg']
+ALLOWED_EXTENSIONS = set(images + sounds)
+UPLOAD_FOLDER = '/srv/www'

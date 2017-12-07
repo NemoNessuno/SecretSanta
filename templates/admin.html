@@ -86,17 +86,18 @@
         <td>{{ question.text }}</td>
         <td>{{ question.q_type }}</td>
         <td>
-          <a class="btn btn-success btn-sm"
-             href="/edit_user?action=admin&id={{question.id}}"
+          <a class="btn btn-{% if question.in_cur_round %}danger{% else %}success{% endif %} btn-sm"
+             href="/edit_question?action=use&id={{question.id}}"
              role="button">
-            Toggle Question Usage
+            {% if question.in_cur_round %}Remove Question{% else %}Add Question{% endif %}
           </a>
         </td>
         <td>
-          <a class="btn btn-danger btn-sm"
-             href="/edit_question?action=delete&id={{question.id}}"
+          <a class="btn btn-sm {% if question.in_use %}btn-secondary disabled{% else %}btn-danger{% endif %}"
+             href="{% if question.in_use %}#{% else %}/edit_question?action=delete&id={{question.id}}{% endif %}"
+             {% if question.in_use %}aria-disabled="true" {% endif %}
              role="button">
-            Remove Question
+            Delete Question
           </a>
         </td>
       </tr>
