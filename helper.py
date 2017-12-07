@@ -6,7 +6,7 @@ from sqlalchemy import and_
 from wtforms import StringField, FileField
 
 from db_handler import db_session
-from forms import DescriptionForm
+from forms import DescriptionForm, Length
 from models import Participation, Round, Answer
 
 
@@ -20,7 +20,8 @@ def build_description_form(current_round, current_description):
         if question.q_type == 'text':
             field = StringField(question.text,
                                 render_kw={"placeholder": gettext('Type your answer here.')},
-                                default=answer_text, description=question.q_type)
+                                default=answer_text, description=question.q_type,
+                                validators=[Length(max=256)])
         else:
             field = FileField(question.text, default=answer_text, description=question.q_type)
 

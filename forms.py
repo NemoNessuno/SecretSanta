@@ -5,6 +5,20 @@ from wtforms.validators import InputRequired, Email, EqualTo, URL, \
     ValidationError
 
 
+class Length(object):
+    def __init__(self, min=-1, max=-1, message=None):
+        self.min = min
+        self.max = max
+        if not message:
+            message = u'Field must be between %i and %i characters long.' % (min, max)
+        self.message = message
+
+    def __call__(self, form, field):
+        l = field.data and len(field.data) or 0
+        if l < self.min or self.max != -1 and l > self.max:
+            raise ValidationError(self.message)
+
+
 class ImageURL(URL):
     def __init__(self, message=None):
         if not message:
@@ -38,7 +52,7 @@ class SignUpForm(FlaskForm):
 
 class QuestionForm(FlaskForm):
     text = StringField(gettext('Question'),
-                       validators=[InputRequired()],
+                       validators=[InputRequired(), Length(max=256)],
                        render_kw={"placeholder": gettext('Enter your question here.')})
     q_type = SelectField(gettext('Type'), choices=[('text', 'Text'), ('image', 'Image'), ('sound', 'Sound')])
 

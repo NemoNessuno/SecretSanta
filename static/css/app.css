@@ -3,3 +3,7 @@
   width: 100%;
   object-fit: cover; /*magic*/
 }
+
+.form-control input {
+  width: 100%;
+}
