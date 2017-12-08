@@ -1,5 +1,7 @@
+import random
 from itertools import ifilter
 
+from flask import flash
 from flask_babel import gettext
 from flask_login import current_user
 from sqlalchemy import and_
@@ -10,12 +12,11 @@ from forms import DescriptionForm, Length
 from models import Participation, Round, Answer
 
 
-def build_description_form(current_round, current_description):
+def build_description_form(current_round, description):
     form = DescriptionForm
 
     for question in current_round.questions:
-        field = None
-        answer = get_answer(current_description.id, question.id)
+        answer = get_answer(description.id, question.id)
         answer_text = '' if answer is None else answer.text
         if question.q_type == 'text':
             field = StringField(question.text,
@@ -28,6 +29,10 @@ def build_description_form(current_round, current_description):
         setattr(form, 'question_{}'.format(question.id), field)
 
     return form()
+
+
+def get_cur_participations(cur_rounds_id):
+    return db_session.query(Participation).filter(Participation.round_id == cur_rounds_id).all()
 
 
 def get_cur_participation(cur_rounds_id):
@@ -47,8 +52,36 @@ def get_cur_round():
         return None
 
 
+def get_answers_for_description(description_id):
+    return db_session.query(Answer).filter(
+        Answer.description_id == description_id,
+    ).all()
+
+
 def get_answer(description_id, question_id):
     return db_session.query(Answer).filter(and_(
         Answer.description_id == description_id,
         Answer.question_id == question_id
     )).first()
+
+
+def print_errors(form):
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(gettext(u"Error in the %s field - %s" % (
+                getattr(form, field).label.text,
+                error)))
+
+
+def random_derangement(n):
+    while True:
+        v = range(n)
+        for j in range(n - 1, -1, -1):
+            p = random.randint(0, j)
+            if v[p] == j:
+                break
+            else:
+                v[j], v[p] = v[p], v[j]
+        else:
+            if v[0] != 0:
+                return tuple(v)

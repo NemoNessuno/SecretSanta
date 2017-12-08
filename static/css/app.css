@@ -4,6 +4,12 @@
   object-fit: cover; /*magic*/
 }
 
+.object-fit-image {
+  max-height: 500px;
+  width: 100%;
+  object-fit: contain; /*magic*/
+}
+
 .form-control input {
   width: 100%;
 }

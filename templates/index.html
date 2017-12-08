@@ -29,7 +29,35 @@
   </div>
 </div>
 {% else %}
-{% if form is none %}
+{% if desc %}
+<div class="card">
+  <div class="card-header">
+    {{_('The drawing is complete!')}}
+  </div>
+  <div class="card-body">
+    <h4 class="card-title">{{ _('Here is the description of your beneficiary.') }}</h4>
+    {% for description in desc %}
+    <div class="form-group">
+      <p>{{ description.question.text }}</p>
+      <div class="form-control">
+        {% if description.question.q_type == 'image' %}
+        <img class="object-fit-image" src="/uploads/{{description.answer.text}}"/>
+        {% elif description.question.q_type == 'sound' %}
+        <div>
+          <audio controls>
+            <source src="/uploads/{{description.answer.text}}">
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+        {% else %}
+        {{description.answer.text}}
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% elif form is none %}
 <div class="alert alert-success" role="alert">
   <h4 class="alert-heading">{{ _('Well done!') }}</h4>
   <p>{{ _('You are eligible to participate. Please wait until the round has been set up.') }}</p>

@@ -1,20 +1,17 @@
-import os
-import uuid
 from functools import wraps
 from random import shuffle
 
-from flask import Flask, render_template, redirect, url_for, flash, request, send_from_directory
+from flask import Flask, render_template, redirect, url_for, flash, send_from_directory
 from flask_babel import Babel, gettext
 from flask_login import LoginManager, login_required, \
     login_user, logout_user, current_user
-from flask_wtf import FlaskForm
 
 import helper
-from admin import handle_admin, handle_edit_user
-from config import ALLOWED_EXTENSIONS
+from admin import handle_admin, handle_edit_user, handle_edit_question, handle_edit_round
 from db_handler import db_session, init_db
+from description import handle_description_form
 from forms import LoginForm, SignUpForm, QuestionForm
-from models import User, Round, Participation, Question, Description, Answer
+from models import User, Participation, Question, Description
 
 # Initialize the base app and load the config
 app = Flask(__name__)
@@ -71,7 +68,7 @@ def login():
                 return redirect(url_for('index'))
         flash(gettext(u"Error with entered e-mail or password."))
     else:
-        print_errors(form)
+        helper.print_errors(form)
 
     return render_template("login.html", form=form, active=-1)
 
@@ -81,6 +78,7 @@ def login():
 def index():
     cur_round = helper.get_cur_round()
     form = None
+    desc = None
     participation = None
     if cur_round is not None:
         participation = helper.get_cur_participation(cur_round.id)
@@ -96,11 +94,20 @@ def index():
 
         if not participation.eligible:
             form = QuestionForm()
+        elif participation.other_description:
+
+            desc = [
+                {
+                    'question': question,
+                    'answer': helper.get_answer(participation.other_description_id, question.id)
+                }
+                for question in cur_round.questions
+            ]
         else:
             form = helper.build_description_form(cur_round, helper.get_cur_participation(cur_round.id).description)
     else:
         flash(gettext("There is currently no active round!"))
-    return render_template('index.html', active=0, participation=participation, form=form)
+    return render_template('index.html', active=0, participation=participation, desc=desc, form=form)
 
 
 @app.route("/add_question", methods=['GET', 'POST'])
@@ -115,7 +122,7 @@ def add_question():
             helper.get_cur_participation(cur_round.id).eligible = True
             db_session.commit()
         else:
-            print_errors(form)
+            helper.print_errors(form)
 
     return redirect(url_for('index'))
 
@@ -127,15 +134,11 @@ def admin():
     return handle_admin()
 
 
-@app.route("/add_round")
+@app.route("/edit_round")
 @admin_required
 @login_required
-def add_round():
-    if helper.get_cur_round() is None:
-        db_session.add(Round())
-        db_session.commit()
-
-    return redirect(url_for('admin'))
+def edit_round():
+    return handle_edit_round()
 
 
 @app.route("/edit_user")
@@ -149,80 +152,13 @@ def edit_user():
 @admin_required
 @login_required
 def edit_question():
-    action = request.args.get('action')
-    question = db_session.query(Question).filter(Question.id == request.args.get('id'))[0]
-    cur_round = helper.get_cur_round()
-
-    if action == 'use':
-        if question in cur_round.questions:
-            cur_round.questions.remove(question)
-        else:
-            cur_round.questions.append(question)
-
-        db_session.commit()
-    elif action == 'delete':
-        db_session.delete(question)
-        db_session.commit()
-
-    return redirect(url_for('admin'))
-
-
-def file_suffix(filename):
-    return filename.rsplit('.', 1)[1].lower()
-
-
-def allowed_file(filename):
-    return '.' in filename and file_suffix(filename) in ALLOWED_EXTENSIONS
+    return handle_edit_question()
 
 
 @app.route("/description", methods=['GET', 'POST'])
 @login_required
 def description():
-    form = FlaskForm()
-    cur_round = helper.get_cur_round()
-    if cur_round is None:
-        return redirect(url_for('index'))
-
-    cur_participation = helper.get_cur_participation(cur_round.id)
-    if cur_participation is None:
-        return redirect(url_for('index'))
-
-    if form.validate_on_submit():
-        form = request.form
-        files = request.files
-        for question in [question for question in form if question.startswith('question')]:
-            if form[question] != '':
-                q_id = question.rsplit('_', 1)[1]
-                answer = helper.get_answer(cur_participation.description.id, q_id)
-                if answer is None:
-                    cur_question = db_session.query(Question).filter(Question.id == q_id).first()
-                    answer = Answer(description=cur_participation.description, question=cur_question)
-                    db_session.add(answer)
-
-                answer.text = form[question]
-                db_session.commit()
-
-        for file_field in files:
-            u_file = files[file_field]
-            if u_file.filename != '':
-                q_id = file_field.rsplit('_', 1)[1]
-                answer = helper.get_answer(cur_participation.description.id, q_id)
-                if answer is None:
-                    cur_question = db_session.query(Question).filter(Question.id == q_id).first()
-                    answer = Answer(description=cur_participation.description, question=cur_question)
-                    db_session.add(answer)
-
-                filename = str(uuid.uuid4())
-                new_filename = "{}.{}".format(filename, file_suffix(u_file.filename))
-                file_path = os.path.join(app.config['UPLOAD_FOLDER'], new_filename)
-                u_file.save(file_path)
-
-                answer.text = new_filename
-                db_session.commit()
-
-    else:
-        print_errors(form)
-    return redirect(url_for('index'))
+    return handle_description_form(app.config)
 
 
 @app.route('/uploads/<filename>')
@@ -254,17 +190,9 @@ def signup():
         login_user(user)
         return redirect(url_for('index'))
     else:
-        print_errors(form)
+        helper.print_errors(form)
 
     return render_template("signup.html", form=form, active=-1)
-
-
-def print_errors(form):
-    for field, errors in form.errors.items():
-        for error in errors:
-            flash(gettext(u"Error in the %s field - %s" % (
-                getattr(form, field).label.text,
-                error)))
 
 
 if __name__ == "__main__":

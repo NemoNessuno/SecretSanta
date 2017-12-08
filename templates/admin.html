@@ -25,8 +25,14 @@
         {% if current_round is not none%}
         <h3>Round startet at {{ current_round.created_at }}</h3>
       </div>
-      <div class="col-4">
-        <a class="btn btn-danger btn-sm float-right" href="/add_round" role="button">End Round</a>
+      <div class="col-2">
+        <a class="btn btn-warning btn-sm float-right
+           {% if not shall_shuffle %}disabled{% endif %}"
+           href="{% if shall_shuffle %}/edit_round?action=shuffle{% else %}#{% endif %}"
+           role="button">Shuffle</a>
+      </div>
+      <div class="col-2">
+        <a class="btn btn-danger btn-sm float-right" href="#" role="button">End Round</a>
       </div>
     </div>
     <div class="row">
@@ -52,7 +58,7 @@
               {{ participation.eligible }}
             </td>
             <td>
-              {{ participation.description.is_filled() }}
+              {{ participation.description.is_filled }}
             </td>
           </tr>
           {% endfor %}
@@ -89,7 +95,7 @@
           <a class="btn btn-{% if question.in_cur_round %}danger{% else %}success{% endif %} btn-sm"
              href="/edit_question?action=use&id={{question.id}}"
              role="button">
-            {% if question.in_cur_round %}Remove Question{% else %}Add Question{% endif %}
+            {% if question.in_cur_round %}Use Question{% else %}Don't Use Question{% endif %}
           </a>
         </td>
         <td>

@@ -95,9 +95,6 @@ class Description(Base):
         self.user = user
         self.questions = questions
 
-    def is_filled(self):
-        return False
-
 
 class Question(Base):
     __tablename__ = 'questions'
