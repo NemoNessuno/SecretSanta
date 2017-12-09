@@ -81,6 +81,9 @@ class Participation(Base):
         self.other_description = other_description
         self.eligible = eligible
 
+    def __repr__(self):
+        return "<Participation {}: Round: {} Eligible: {}>".format(self.id, self.round_id, self.eligible)
+
 
 class Description(Base):
     __tablename__ = 'descriptions'

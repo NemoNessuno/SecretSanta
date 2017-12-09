@@ -1,17 +1,17 @@
 from functools import wraps
 from random import shuffle
 
-from flask import Flask, render_template, redirect, url_for, flash, send_from_directory
+from flask import Flask, render_template, redirect, url_for, flash, send_from_directory, request
 from flask_babel import Babel, gettext
 from flask_login import LoginManager, login_required, \
     login_user, logout_user, current_user
 
 import helper
-from admin import handle_admin, handle_edit_user, handle_edit_question, handle_edit_round
+from admin import handle_admin, handle_edit_user, handle_edit_question, handle_edit_round, handle_edit_participation
 from db_handler import db_session, init_db
 from description import handle_description_form
 from forms import LoginForm, SignUpForm, QuestionForm
-from models import User, Participation, Question, Description
+from models import User, Question
 
 # Initialize the base app and load the config
 app = Flask(__name__)
@@ -43,7 +43,7 @@ def unauthorized():
 def admin_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
-        if not current_user.is_admin():
+        if current_user is not User and not current_user.is_admin():
             return unauthorized()
         return func(*args, **kwargs)
 
@@ -80,34 +80,38 @@ def index():
     form = None
     desc = None
     participation = None
+    can_participate = False
     if cur_round is not None:
         participation = helper.get_cur_participation(cur_round.id)
 
-        if participation is None:
-            participation = Participation(
-                cur_round=cur_round,
-                description=Description(
-                    user=current_user)
-            )
-            db_session.add(participation)
-            db_session.commit()
+        if participation is not None:
+            if not participation.eligible:
+                form = QuestionForm()
+            elif participation.other_description:
 
-        if not participation.eligible:
-            form = QuestionForm()
-        elif participation.other_description:
-
-            desc = [
-                {
+                desc = [{
                     'question': question,
                     'answer': helper.get_answer(participation.other_description_id, question.id)
-                }
-                for question in cur_round.questions
-            ]
+                } for question in cur_round.questions]
+            else:
+                form = helper.build_description_form(cur_round, helper.get_cur_participation(cur_round.id).description)
         else:
-            form = helper.build_description_form(cur_round, helper.get_cur_participation(cur_round.id).description)
+            participations = helper.get_cur_participations(cur_round.id)
+            can_participate = all([not l_participation.other_description for l_participation in participations])
     else:
         flash(gettext("There is currently no active round!"))
-    return render_template('index.html', active=0, participation=participation, desc=desc, form=form)
+    return render_template('index.html', active=0,
+                           active_round=cur_round is not None,
+                           participation=participation,
+                           can_participate=can_participate,
+                           desc=desc, form=form)
+
+
+@app.route("/edit_participation")
+@login_required
+def edit_participation():
+    action = request.args.get('action')
+    return handle_edit_participation(action)
 
 
 @app.route("/add_question", methods=['GET', 'POST'])

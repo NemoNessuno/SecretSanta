@@ -7,7 +7,7 @@ from werkzeug.utils import redirect
 import helper
 from db_handler import db_session
 from helper import get_cur_round
-from models import Round, Question, User, Participation
+from models import Round, Question, User, Participation, Description
 
 
 def handle_admin():
@@ -97,3 +97,31 @@ def handle_edit_round():
 
             db_session.commit()
     return redirect(url_for('admin'))
+
+
+def handle_edit_participation(action):
+    if action == 'add':
+        cur_round = helper.get_cur_round()
+
+        if cur_round is not None:
+            participation = Participation(
+                cur_round=cur_round,
+                description=Description(
+                    user=current_user)
+            )
+
+            db_session.add(participation)
+            db_session.commit()
+        return redirect(url_for('index'))
+
+    elif action == 'remove':
+        if not (current_user.is_admin()):
+            return redirect(url_for('index'))
+
+        part_id = request.args.get('id')
+        print db_session.query(Participation).all()
+        db_session.query(Participation).filter(Participation.id == part_id).delete()
+        db_session.commit()
+        print db_session.query(Participation).all()
+
+        return redirect(url_for('admin'))

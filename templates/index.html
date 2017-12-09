@@ -1,12 +1,34 @@
 {% extends "layout.html" %}
 {% block title %} {{_('Home')}} {% endblock %}
 {% block content %}
-{% if participation is none %}
+{% if not active_round %}
 <div>
-  <div class="alert alert-warning" role="alert">
+  <div class="alert alert-danger" role="alert">
     {{ _('There is no round at the moment!') }}
   </div>
 </div>
+{% elif participation is none %}
+{%if can_participate%}
+<div>
+  <div class="alert alert-success" role="alert">
+    <h4 class="alert_heading">{{ _('There is an active round currently running.') }}</h4>
+    <p>{{ _('Press the button below to participate!') }}</p>
+  </div>
+  <div class="row">
+    <div class="row">
+      <a class="btn btn-success btn-sm" href="/edit_participation?action=add"
+         role="button">{{_('Participate')}}</a>
+    </div>
+  </div>
+</div>
+{% else %}
+<div>
+  <div class="alert alert-warning" role="alert">
+    {{ _('Although there is an active round at the moment, the lots have already been drawn.
+    I am afraid you have to wait for the next round.') }}
+  </div>
+</div>
+{% endif %}
 {% elif not participation.eligible %}
 <div class="card">
   <div class="card-header">
