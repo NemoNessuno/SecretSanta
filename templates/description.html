@@ -1,5 +1,19 @@
-{% extends "layout.html" %}
-{% block title %} {{_('Description')}} {% endblock %}
-{% block content %}
-{% include 'description_form.html' %}
-{% endblock %}
+{% for item in description %}
+<div class="form-group">
+  <p>{{ item.question.text }}</p>
+  <div class="form-control">
+    {% if item.question.q_type == 'image' %}
+    <img class="object-fit-image" src="/uploads/{{item.answer.text}}"/>
+    {% elif item.question.q_type == 'sound' %}
+    <div>
+      <audio controls>
+        <source src="/uploads/{{item.answer.text}}">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+    {% else %}
+    {{item.answer.text}}
+    {% endif %}
+  </div>
+</div>
+{% endfor %}

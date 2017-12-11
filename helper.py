@@ -73,6 +73,13 @@ def print_errors(form):
                 error)))
 
 
+def build_description(questions, description_id):
+    return [{
+        'question': question,
+        'answer': get_answer(description_id, question.id)
+    } for question in questions]
+
+
 def random_derangement(n):
     while True:
         v = range(n)

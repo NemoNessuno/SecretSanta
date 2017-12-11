@@ -88,23 +88,17 @@ def index():
             if not participation.eligible:
                 form = QuestionForm()
             elif participation.other_description:
-
-                desc = [{
-                    'question': question,
-                    'answer': helper.get_answer(participation.other_description_id, question.id)
-                } for question in cur_round.questions]
+                desc = helper.build_description(cur_round.questions, participation.other_description.id)
             else:
                 form = helper.build_description_form(cur_round, helper.get_cur_participation(cur_round.id).description)
         else:
             participations = helper.get_cur_participations(cur_round.id)
             can_participate = all([not l_participation.other_description for l_participation in participations])
-    else:
-        flash(gettext("There is currently no active round!"))
-    return render_template('index.html', active=0,
+    return render_template('index.html', active=0, is_admin=current_user.is_admin(),
                            active_round=cur_round is not None,
                            participation=participation,
                            can_participate=can_participate,
-                           desc=desc, form=form)
+                           description=desc, form=form)
 
 
 @app.route("/edit_participation")
@@ -171,12 +165,21 @@ def send_file(filename):
 
 
 @app.route("/gallery")
+@admin_required
 @login_required
 def gallery():
-    descriptions = [user.description for user in User.query.all()]
-    shuffle(descriptions)
+    cur_round = helper.get_cur_round()
 
-    return render_template('gallery.html', active=0,
+    if cur_round is None:
+        return redirect(url_for('admin'))
+    else:
+        descriptions = [
+            helper.build_description(cur_round.questions, participation.description_id)
+            for participation in helper.get_cur_participations(cur_round.id)
+        ]
+        shuffle(descriptions)
+
+    return render_template('gallery.html', active=2, is_admin=True,
                            descriptions=descriptions)
 
 

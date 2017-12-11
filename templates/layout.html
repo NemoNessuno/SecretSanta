@@ -5,8 +5,8 @@
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
   <link href="{{ url_for('static', filename='css/jumbotron-narrow.css') }}" rel="stylesheet" type="text/css">
-  <link href="{{ url_for('static', filename='css/slick.css') }}" rel="stylesheet" type="text/css">
-  <link href="{{ url_for('static', filename='css/slick-theme.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ url_for('static', filename='css/slick.min.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ url_for('static', filename='css/slick-theme.min.css') }}" rel="stylesheet" type="text/css">
   <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet" type="text/css">
   <script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
@@ -22,6 +22,19 @@
             {{_('Home')}}
           </a>
         </li>
+        {% if is_admin %}
+        <li class="nav-item">
+          <a class="nav-link {% if active == 1: %} active {% endif %}" href="/admin">
+            {{_('Admin')}}
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if active == 2: %} active {% endif %}" href="/gallery">
+            {{_('Gallery')}}
+          </a>
+        </li>
+
+        {% endif %}
         <li class="nav-item">
           <a href="logout" class="nav-link text-danger">
             {{_('Logout')}}

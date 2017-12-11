@@ -1,24 +1,28 @@
 {% extends "layout.html" %}
 {% block title %} {{_('Gallery')}} {% endblock %}
 {% block content %}
-<script type="text/javascript"
-        src="//cdn.jsdelivr.net/jquery.slick/1.6.0/slick.min.js"></script>
+<script src="{{ url_for('static', filename='js/slick.min.js') }}"></script>
 <script>
 $(document).ready(function(){
     $('.gallery-item').slick({
         infinite: false,
-        arrows: true
+        arrows: false,
+        dots:true
     });
 });
-
 </script>
-<center>
-  <div class="gallery-item">
-    {% for description in descriptions %}
+
+<div class="card">
+  <div class="card-body">
     <div>
-      {% include 'description_form.html' %}
+      <div class="gallery-item">
+        {% for description in descriptions %}
+        <div>
+          {% include 'description.html' %}
+        </div>
+        {% endfor %}
+      </div>
     </div>
-    {% endfor %}
   </div>
-</center>
+</div>
 {% endblock %}

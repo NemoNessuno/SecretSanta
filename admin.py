@@ -33,7 +33,7 @@ def handle_admin():
     shall_shuffle = all([participation.description.is_filled for participation in participations]) \
                     and not any([participation.other_description for participation in participations])
 
-    return render_template('admin.html', active=2,
+    return render_template('admin.html', active=1, is_admin=True,
                            rounds=rounds,
                            participations=participations,
                            shall_shuffle=shall_shuffle,
@@ -119,9 +119,7 @@ def handle_edit_participation(action):
             return redirect(url_for('index'))
 
         part_id = request.args.get('id')
-        print db_session.query(Participation).all()
         db_session.query(Participation).filter(Participation.id == part_id).delete()
         db_session.commit()
-        print db_session.query(Participation).all()
 
         return redirect(url_for('admin'))
