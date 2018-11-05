@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Get the latest version from github
+git pull
+
 #Always put the current path here or you won't be able to run!
 export FLASK_CONFIG="/home/pi/SecretSanta/config.py"
 export FLASK_APP=main.py
