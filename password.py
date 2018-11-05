@@ -31,7 +31,7 @@ class Password(TypeDecorator):
         """
         if isinstance(value, PasswordHash):
             return value
-        elif isinstance(value, basestring):
+        elif isinstance(value,str):
             return PasswordHash.new(value, self.rounds)
         elif value is not None:
             raise TypeError(
@@ -48,10 +48,9 @@ class PasswordHash(object):
 
     def __eq__(self, candidate):
         """Hashes the candidate string and compares it to the stored hash."""
-        if isinstance(candidate, basestring):
-            if isinstance(candidate, unicode):
+        if isinstance(candidate,str):
                 candidate = candidate.encode('utf8')
-                return bcrypt.hashpw(candidate, self.hash) == self.hash
+                return bcrypt.hashpw(candidate, self.hash.encode('utf8')) == self.hash
         return False
 
     def __repr__(self):
@@ -61,6 +60,6 @@ class PasswordHash(object):
     @classmethod
     def new(cls, password, rounds):
         """Creates a PasswordHash from the given password."""
-        if isinstance(password, unicode):
+        if isinstance(password, str):
             password = password.encode('utf8')
         return cls(bcrypt.hashpw(password, bcrypt.gensalt(rounds)))

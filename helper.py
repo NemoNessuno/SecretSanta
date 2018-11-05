@@ -1,5 +1,4 @@
 import random
-from itertools import ifilter
 
 from flask import flash
 from flask_babel import gettext
@@ -38,7 +37,7 @@ def get_cur_participations(cur_rounds_id):
 def get_cur_participation(cur_rounds_id):
     participations = db_session.query(Participation).filter(Participation.round_id == cur_rounds_id).all()
     participation = next(
-        ifilter(lambda part: part.description.user_id == current_user.email,
+        filter(lambda part: part.description.user_id == current_user.email,
                 participations), None)
     return participation
 
