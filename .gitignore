@@ -91,7 +91,14 @@ ENV/
 # The current database
 database.db
 
+# Database BackUp
+database.db_bk
+
+# Random Linux Stuff
 *.swp
 nohup.out
 
 Pipfile.lock
+
+# Idea
+.idea/
