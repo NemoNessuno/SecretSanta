@@ -1,5 +1,3 @@
-from itertools import ifilter
-
 from flask import render_template, url_for, request
 from flask_login import current_user
 from werkzeug.utils import redirect
@@ -15,7 +13,7 @@ def handle_admin():
     questions = db_session.query(Question).all()
 
     users = db_session.query(User).all()
-    current_round = next(ifilter(lambda cur_round: cur_round.running, rounds), None)
+    current_round = next(filter(lambda cur_round: cur_round.running, rounds), None)
 
     for question in questions:
         question.in_cur_round = question in current_round.questions
