@@ -38,6 +38,21 @@ class LoginForm(FlaskForm):
     password = PasswordField(gettext('Password'), validators=[InputRequired()])
 
 
+class RequestResetPasswordForm(FlaskForm):
+    email = StringField(gettext('E-Mail Address'),
+                        validators=[InputRequired()])
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField(gettext('Password'),
+                             validators=[InputRequired(),
+                                         EqualTo('confirm',
+                                                 message='Passwords must match')
+                                         ])
+    confirm = PasswordField(gettext('Repeat Password'),
+                            validators=[InputRequired()])
+
+
 class SignUpForm(FlaskForm):
     email = StringField(gettext('E-Mail Address'),
                         validators=[InputRequired(), Email()])

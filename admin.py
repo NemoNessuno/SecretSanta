@@ -2,9 +2,8 @@ from flask import render_template, url_for, request
 from flask_login import current_user
 from werkzeug.utils import redirect
 
-import helper
+import helper.generic_helper as helper
 from db_handler import db_session
-from helper import get_cur_round
 from models import Round, Question, User, Participation, Description
 
 
@@ -15,12 +14,12 @@ def handle_admin():
     users = db_session.query(User).all()
     current_round = next(filter(lambda cur_round: cur_round.running, rounds), None)
 
-    for question in questions:
-        question.in_cur_round = question in current_round.questions
-        question.in_use = question.in_cur_round or any([(question in a_round.questions) for a_round in rounds])
-
     participations = []
     if current_round is not None:
+        for question in questions:
+            question.in_cur_round = question in current_round.questions
+            question.in_use = question.in_cur_round or any([(question in a_round.questions) for a_round in rounds])
+ 
         participations = db_session.query(Participation).filter(Participation.round_id == current_round.id).all()
         for participation in participations:
             answers = helper.get_answers_for_description(participation.description_id)
@@ -58,7 +57,7 @@ def handle_edit_user():
 def handle_edit_question():
     action = request.args.get('action')
     question = db_session.query(Question).filter(Question.id == request.args.get('id'))[0]
-    cur_round = get_cur_round()
+    cur_round = helper.get_cur_round()
 
     if action == 'use':
         if question in cur_round.questions:
@@ -74,8 +73,7 @@ def handle_edit_question():
     return redirect(url_for('admin'))
 
 
-def handle_edit_round():
-    action = request.args.get('action')
+def handle_edit_round(action):
     cur_round = helper.get_cur_round()
 
     if action == 'add':

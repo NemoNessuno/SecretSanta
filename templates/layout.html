@@ -1,17 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>SecretSanta - {% block title %}{% endblock %} </title>
-  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
-  <link href="{{ url_for('static', filename='css/jumbotron-narrow.css') }}" rel="stylesheet" type="text/css">
-  <link href="{{ url_for('static', filename='css/slick.min.css') }}" rel="stylesheet" type="text/css">
-  <link href="{{ url_for('static', filename='css/slick-theme.min.css') }}" rel="stylesheet" type="text/css">
-  <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet" type="text/css">
-  <script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-</head>
-<body>
+{% extends "base.html" %}
+{% block body %}
 <div class="container">
   <div class="header clearfix">
     <nav role="navigation">
@@ -43,7 +31,7 @@
         {%endif%}
       </ul>
     </nav>
-    <h3 class="text-muted">Secret Santa</h3>
+    <a href="/"><h3 class="text-muted">Secret Santa</h3></a>
   </div>
   <p class="lead"></p>
   {% with messages = get_flashed_messages() %}
@@ -60,5 +48,4 @@
     {% endblock %}
   </main>
 </div>
-</body>
-</html>
+{% endblock %}

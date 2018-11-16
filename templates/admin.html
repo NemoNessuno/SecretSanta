@@ -20,19 +20,20 @@
 <!-- Tab panes -->
 <div class="tab-content p-1">
   <div class="tab-pane active" id="current" role="tabpanel">
+    {% if current_round is not none%}
     <div class="row">
       <div class="col-8">
-        {% if current_round is not none%}
         <h3>Round startet at {{ current_round.created_at }}</h3>
       </div>
       <div class="col-2">
         <a class="btn btn-warning btn-sm float-right
            {% if not shall_shuffle %}disabled{% endif %}"
-           href="{% if shall_shuffle %}/edit_round?action=shuffle{% else %}#{% endif %}"
+           href="{% if shall_shuffle %}/edit_round/shuffle{% else %}#{% endif %}"
            role="button">Shuffle</a>
       </div>
       <div class="col-2">
-        <a class="btn btn-danger btn-sm float-right" href="#" role="button">End Round</a>
+        <a class="btn btn-danger btn-sm float-right" href="/edit_round/stop/{{
+          current_round.id }}" role="button">End Round</a>
       </div>
     </div>
     <div class="row">
@@ -75,12 +76,45 @@
     <p>There is currently no active round!</p>
     <div class="row">
       <div class="col">
-        <a class="btn btn-success btn-sm" href="/add_round" role="button">Add Round</a>
+        <a class="btn btn-success btn-sm" href="/edit_round/add" role="button">Add Round</a>
       </div>
     </div>
     {% endif %}
   </div>
-  <div class="tab-pane" id="former" role="tabpanel">{{rounds}}</div>
+  <div class="tab-pane" id="former" role="tabpanel">
+    {% if rounds|length > 0 %}
+    <div class="row">
+      <div class="col">
+        <table class="table table-hover">
+          <thead class="thead-default">
+          <tr>
+            <th>ID</th>
+            <th>Created at</th>
+            <th>Questions</th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for round in rounds %}
+          <tr>
+            <td>
+              {{ round.id }}
+            </td>
+            <td>
+              {{ round.created_at }}
+            </td>
+            <td>
+              TODO
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <p>There no former rounds.</p>
+    {% endif %}
+  </div>
   <div class="tab-pane" id="questions" role="tabpanel">
     <table class="table table-hover">
       <thead class="thead-default">

@@ -42,7 +42,7 @@ class User(Base):
         self.validated = False
 
     def __repr__(self):
-        return '<User %r>' % self.email
+        return '<User {}>'.format(self.email)
 
 
 round_questions = Table(
@@ -62,6 +62,10 @@ class Round(Base):
     def __init__(self, running=True, created_at=datetime.now()):
         self.running = running
         self.created_at = created_at
+
+    def __repr__(self):
+        return "<Round - Created at: {} Running: {}>".format(self.created_at,
+                self.running)
 
 
 class Participation(Base):

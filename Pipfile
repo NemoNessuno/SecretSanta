@@ -16,6 +16,9 @@ bcrypt = "*"
 flask-babel = "*"
 flask-wtf = "*"
 gunicorn = "*"
+itsdangerous = "*"
+flask-mail = "*"
+pyyaml = "*"
 
 
 [dev-packages]

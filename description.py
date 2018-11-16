@@ -7,7 +7,7 @@ from werkzeug.utils import redirect
 
 from config import ALLOWED_EXTENSIONS
 from db_handler import db_session
-from helper import get_answer, get_cur_round, get_cur_participation, print_errors
+from helper.generic_helper import get_answer, get_cur_round, get_cur_participation, print_errors
 from models import Answer, Question
 
 

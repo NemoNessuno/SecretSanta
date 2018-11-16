@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{# secretsanta/templates/email/activate.html #}
+
+{% block body %}
+{% block title %} {{_('Reset your password')}} {% endblock %}
+<div>
+  You requested to reset your password<br>
+  Follow the link below:
+  <p> <a href="{{ reset_url }}">{{ reset_url }}</a> </p>
+</div>
+
+{% endblock %}

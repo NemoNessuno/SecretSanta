@@ -1,18 +1,31 @@
 {% extends "layout.html" %}
 {% block title %} {{_('Login')}} {% endblock %}
 {% block content %}
-<form action="{{ url_for('login') }}" method="post">
+<center>
+  <div class="row">
+    <div class="col">
+  <form action="{{ url_for('login') }}" method="post">
   {{ form.csrf_token }}
   {% for field in form if field.widget.input_type != 'hidden' %}
-  <div class="form-group">
-    {{ field.label }}
-    {{ field(class_="form-control") }}
+   <div class="form-group">
+     {{ field.label }}
+     {{ field(class_="form-control") }}
+   </div>
+   {% endfor %}
+   <input type='submit' value={{_('Login')}} class='btn
+         btn-primary btn-lg'/>
+   <a href="signup" class="btn btn-success btn-lg">{{_("Sign Up")}}</a>
+  </form>
   </div>
-  {% endfor %}
-  <input type='submit' value={{_('Login')}} class='btn
-        btn-primary btn-lg'/>
-  <a href="signup" class="btn btn-success btn-lg">{{_("Sign Up")}}</a>
   </div>
-</form>
+  <div class="row">
+    <div class="col">
+    <p>
+      <small class="text-muted">
+        <a href=request_reset_password>{{_('Forgot your password?')}}</a>
+      </small>
+    </p>
+  </div>
+  </div>
 </center>
 {% endblock %}

@@ -102,3 +102,6 @@ Pipfile.lock
 
 # Idea
 .idea/
+
+# Secret Config File
+secret_config

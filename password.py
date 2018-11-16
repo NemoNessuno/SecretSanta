@@ -41,16 +41,19 @@ class Password(TypeDecorator):
 class PasswordHash(object):
 
     def __init__(self, hash_):
-        assert len(hash_) == 60, 'bcrypt hash should be 60 chars.'
-        assert hash_.count('$'), 'bcrypt hash should have 3x "$".'
-        self.hash = str(hash_)
-        self.rounds = int(self.hash.split('$')[2])
+        #assert len(hash_) == 60, 'bcrypt hash should be 60 chars.'
+        if isinstance(hash_, str):
+            hash_ = hash_.encode('utf8')
+        assert hash_.count(b'$'), 'bcrypt hash should have 3x "$".'
+        self.hash = hash_
+        self.rounds = int(self.hash.split(b'$')[2])
 
     def __eq__(self, candidate):
         """Hashes the candidate string and compares it to the stored hash."""
         if isinstance(candidate,str):
                 candidate = candidate.encode('utf8')
-                return bcrypt.hashpw(candidate, self.hash.encode('utf8')) == self.hash
+                cmp_hash = bcrypt.hashpw(candidate, self.hash)
+                return cmp_hash == self.hash
         return False
 
     def __repr__(self):
@@ -60,6 +63,4 @@ class PasswordHash(object):
     @classmethod
     def new(cls, password, rounds):
         """Creates a PasswordHash from the given password."""
-        if isinstance(password, str):
-            password = password.encode('utf8')
-        return cls(bcrypt.hashpw(password, bcrypt.gensalt(rounds)))
+        return cls(bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt(rounds)))
