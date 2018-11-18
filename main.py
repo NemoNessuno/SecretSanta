@@ -117,7 +117,7 @@ def reset_password(token):
     try:
         email = ts.loads(token, salt="reset-password-key", max_age=1800)
     except:
-        flash(u"Invalid token. Maybe it is outdated.")
+        flash(gettext(u"Invalid token. Maybe it is outdated."))
         return redirect(url_for('index'))
 
     if form.validate_on_submit():
@@ -127,7 +127,7 @@ def reset_password(token):
         db_session.add(user)
         db_session.commit()
         
-        flash(u"Password changed successfully.")
+        flash(gettext(u"Password changed successfully."))
         return redirect(url_for('index'))
     else:
         generic_helper.print_errors(form)   
@@ -248,15 +248,19 @@ def gallery():
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
     form = SignUpForm()
-    if form.validate_on_submit():
-        user = User()
-        user.email = form.email.data
-        user.password = form.password.data
-        user.admin = db_session.query(User).count() < 1
-        user.authenticated = True
-        db_session.add(user)
-        db_session.commit()
-        login_user(user)
+    if form.validate_on_submit(): 
+        user = User.query.get(form.email.data)
+        if user is None:
+            user = User()
+            user.email = form.email.data
+            user.password = form.password.data
+            user.admin = db_session.query(User).count() < 1
+            user.authenticated = True
+            db_session.add(user)
+            db_session.commit()
+            login_user(user)
+        else:
+            flash(gettext(u"A user with this email already exists."))
         return redirect(url_for('index'))
     else:
         generic_helper.print_errors(form)
