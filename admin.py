@@ -22,10 +22,14 @@ def handle_admin():
  
         participations = db_session.query(Participation).filter(Participation.round_id == current_round.id).all()
         for participation in participations:
-            answers = helper.get_answers_for_description(participation.description_id)
-            participation.description.is_filled = \
-                len(answers) == len(current_round.questions) and \
-                all([answer.text is not None and not answer.text.isspace() for answer in answers])
+            unanswered = []
+            for question in current_round.questions:
+                answer = helper.get_answer(participation.description_id,
+                        question.id)
+                if answer is None or answer.text.isspace():
+                    unanswered.append(question.text)
+            participation.description.unanswered = unanswered
+            participation.description.is_filled = len(unanswered) == 0
 
     shall_shuffle = all([participation.description.is_filled for participation in participations]) \
                     and not any([participation.other_description for participation in participations])

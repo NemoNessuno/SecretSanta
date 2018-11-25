@@ -106,7 +106,7 @@ class Description(Base):
 class Question(Base):
     __tablename__ = 'questions'
     id = Column('id', Integer, primary_key=True)
-    text = Column(String(256))
+    text = Column(String(512))
     q_type = Column('type', Enum('text', 'image', 'sound'))
 
     def __init__(self, text=None, q_type='text'):

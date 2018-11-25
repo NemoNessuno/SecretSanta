@@ -46,6 +46,7 @@
             <th>User</th>
             <th>Eligible</th>
             <th>Filled</th>
+            <th>Unanswered</th>
             <th>&nbsp;</th>
           </tr>
           </thead>
@@ -60,6 +61,9 @@
             </td>
             <td>
               {{ participation.description.is_filled }}
+            </td>
+            <td>
+              {{ participation.description.unanswered }}
             </td>
             <td>
               <a class="btn btn-danger btn-sm" href="/edit_participation?action=remove&id={{participation.id}}"
