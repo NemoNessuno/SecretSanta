@@ -81,7 +81,7 @@ def build_description(questions, description_id):
 
 def random_derangement(n):
     while True:
-        v = range(n)
+        v = list(range(n))
         for j in range(n - 1, -1, -1):
             p = random.randint(0, j)
             if v[p] == j:
